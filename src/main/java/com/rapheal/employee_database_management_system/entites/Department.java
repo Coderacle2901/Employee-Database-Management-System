@@ -6,6 +6,7 @@ import lombok.Data;
 import java.util.ArrayList;
 import java.util.List;
 
+// Department entities blueprint
 @Entity
 @Data
 public class Department {

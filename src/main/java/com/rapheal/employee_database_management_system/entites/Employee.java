@@ -3,6 +3,8 @@ package com.rapheal.employee_database_management_system.entites;
 import jakarta.persistence.*;
 import lombok.Data;
 
+
+// Employee entities blueprint
 @Entity
 @Data
 public class Employee {
