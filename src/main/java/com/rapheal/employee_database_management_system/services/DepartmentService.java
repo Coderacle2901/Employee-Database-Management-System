@@ -6,12 +6,11 @@ import com.rapheal.employee_database_management_system.entites.Department;
 import java.util.List;
 
 public interface DepartmentService {
-    Department createDepartment(DepartmentDTO newDepartmentData);
+
+    DepartmentDTO createDepartment(DepartmentDTO newDepartmentData);
     List<Department> getAllDepartments();
-    Department getDepartmentById(Long id);
-    Department updateDepartmentDetails(Long id, DepartmentDTO newDepartmentDetails);
+    DepartmentDTO getDepartmentById(Long id);
+    DepartmentDTO updateDepartmentDetails(Long id, DepartmentDTO newDepartmentDetails);
     void deleteDepartmentById(Long id);
-
-
 
 }

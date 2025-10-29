@@ -8,19 +8,19 @@ import java.util.Map;
 
 public interface EmployeeService {
     // Save a new employee to the database.
-    Employee createEmployee(EmployeeDTO newEmployeeData);
+    EmployeeDTO createEmployee(EmployeeDTO newEmployeeData);
 
     // Retrieve all employees.
     List<Employee> getAllEmployees();
 
     // Get a specific employee using their ID.
-    Employee getEmployeeById(Long id);
+    EmployeeDTO getEmployeeById(Long id);
 
     // Update an employee’s details.
-    Employee updateEmployeeDetails(Long id, EmployeeDTO newEmployeeDetails);
+    EmployeeDTO updateEmployeeDetails(Long id, EmployeeDTO newEmployeeDetails);
 
     // Update  single/multiple specific employee details.
-    Employee updateEmployeeDetailsPartially(Long id, Map<String,Object> updateData);
+    EmployeeDTO updateEmployeeDetailsPartially(Long id, Map<String,Object> updateData);
 
     // Delete an employee from the Database.
     void deleteEmployee(Long id);

@@ -26,4 +26,7 @@ public class EmployeeDTO {
 
     @NotBlank(message = "Hire Date is required")
     private String hireDate;
+
+    @NotBlank(message = "Department ID is required")
+    private Long departmentId;
 }
