@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 @Service
 public class EmployeeServiceImpl implements EmployeeService{
     // Object mapper for easier conversion of DtOs to Maps
-    private ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
 
     // ModelMapper for faster and easier mapping of DtOs to Entities
     private final ModelMapper mapper;
@@ -81,8 +81,6 @@ public EmployeeDTO createEmployee(EmployeeDTO newEmployeeData) {
 
         Employee matchingEmployee = employeeRepository.findById(id).orElseThrow(()-> new NoSuchElementException("Employed with ID: " + id + " could not be found"));
 
-
-
         Map<String, Object> employeeDetails = objectMapper.convertValue(newEmployeeDetails, Map.class);
 
         for(Map.Entry<String, Object> employee : employeeDetails.entrySet()){
@@ -104,6 +102,19 @@ public EmployeeDTO createEmployee(EmployeeDTO newEmployeeData) {
                 case "hireDate" -> matchingEmployee.setHireDate((String) value);
             }
 
+        }
+
+        if (newEmployeeDetails.getDepartmentId() != null) {
+            Department newDepartment = departmentRepository.findById(newEmployeeDetails.getDepartmentId())
+                    .orElseThrow(() -> new NoSuchElementException("Department not found"));
+
+            Department currentDepartment = matchingEmployee.getDepartment();
+
+            if(currentDepartment != null && !currentDepartment.equals(newDepartment)){
+               currentDepartment.getEmployees().remove(matchingEmployee);
+            }
+
+            newDepartment.addEmployee(matchingEmployee);
         }
 
         Employee savedEmployee = employeeRepository.save(matchingEmployee);
@@ -131,13 +142,27 @@ public EmployeeDTO createEmployee(EmployeeDTO newEmployeeData) {
                 case "email" -> matchingEmployee.setEmail((String) value);
                 case "age" -> matchingEmployee.setAge(Integer.parseInt(value.toString()));
                 case "hireDate" -> matchingEmployee.setHireDate((String) value);
+                case "departmentId" -> {
+                    Department newDept = departmentRepository.findById(Long.parseLong(value.toString()))
+                            .orElseThrow(() -> new NoSuchElementException("Department not found"));
+
+                    Department currentDept = matchingEmployee.getDepartment();
+                    if (currentDept != null && !currentDept.equals(newDept)) {
+                        currentDept.getEmployees().remove(matchingEmployee);
+                    }
+
+                    newDept.addEmployee(matchingEmployee);
+                }
+
             }
         }
+
 
         Employee savedEmployee = employeeRepository.save(matchingEmployee);
         return mapper.map(savedEmployee, EmployeeDTO.class);
 
     }
+
 
     // Deletes a specific Employee Entity Using Employee_ID
     @Override

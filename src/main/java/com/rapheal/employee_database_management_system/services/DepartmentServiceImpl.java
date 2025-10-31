@@ -2,12 +2,15 @@ package com.rapheal.employee_database_management_system.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rapheal.employee_database_management_system.DTOs.DepartmentDTO;
+import com.rapheal.employee_database_management_system.DTOs.EmployeeDTO;
 import com.rapheal.employee_database_management_system.entites.Department;
+import com.rapheal.employee_database_management_system.entites.Employee;
 import com.rapheal.employee_database_management_system.repositories.DepartmentRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -102,4 +105,21 @@ public class DepartmentServiceImpl implements DepartmentService {
         departmentRepository.delete(matchingDepartment);
 
     }
+
+    // Returns all employees in a department by its ID, sorted by employee ID.
+    // Throws an exception if the department is not found.
+    @Override
+    public List<EmployeeDTO> getDepartmentEmployees(Long id) {
+        Department matchingDepartment = departmentRepository.findById(id).orElseThrow(()-> new NoSuchElementException("Department with id: " + id + " not found"));
+
+        return matchingDepartment.getEmployees()
+                .stream()
+                .sorted(Comparator.comparing(Employee::getId))
+                .map(e -> mapper.map(e,EmployeeDTO.class))
+                .collect(Collectors.toList());
+    }
+
+
+
+
 }

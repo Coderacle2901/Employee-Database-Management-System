@@ -1,6 +1,7 @@
 package com.rapheal.employee_database_management_system.services;
 
 import com.rapheal.employee_database_management_system.DTOs.DepartmentDTO;
+import com.rapheal.employee_database_management_system.DTOs.EmployeeDTO;
 
 import java.util.List;
 
@@ -11,5 +12,7 @@ public interface DepartmentService {
     DepartmentDTO getDepartmentById(Long id);
     DepartmentDTO updateDepartmentDetails(Long id, DepartmentDTO newDepartmentDetails);
     void deleteDepartmentById(Long id);
+    List<EmployeeDTO> getDepartmentEmployees(Long id);
+
 
 }
