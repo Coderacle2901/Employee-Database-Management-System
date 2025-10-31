@@ -1,7 +1,6 @@
 package com.rapheal.employee_database_management_system.services;
 
 import com.rapheal.employee_database_management_system.DTOs.EmployeeDTO;
-import com.rapheal.employee_database_management_system.entites.Employee;
 
 import java.util.List;
 import java.util.Map;
@@ -11,7 +10,7 @@ public interface EmployeeService {
     EmployeeDTO createEmployee(EmployeeDTO newEmployeeData);
 
     // Retrieve all employees.
-    List<Employee> getAllEmployees();
+    List<EmployeeDTO> getAllEmployees();
 
     // Get a specific employee using their ID.
     EmployeeDTO getEmployeeById(Long id);

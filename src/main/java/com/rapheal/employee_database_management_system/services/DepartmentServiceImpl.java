@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 @Service
 public class DepartmentServiceImpl implements DepartmentService {
@@ -48,8 +49,12 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     // Returns a list of all department entities in the database
     @Override
-    public List<Department> getAllDepartments() {
-        return departmentRepository.findAll();
+    public List<DepartmentDTO> getAllDepartments() {
+        return departmentRepository.findAll()
+                .stream()
+                .map(d -> mapper.map(d,DepartmentDTO.class))
+                .collect(Collectors.toList());
+
     }
 
 

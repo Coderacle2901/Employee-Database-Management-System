@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService{
@@ -29,19 +30,20 @@ public class EmployeeServiceImpl implements EmployeeService{
     private final EmployeeRepository employeeRepository;
 
     // Constructor Dependency Injection
+
     @Autowired
-    public EmployeeServiceImpl(EmployeeRepository employeeRepository, ModelMapper mapper, DepartmentRepository departmentRepository, ObjectMapper objectMapper) {
-        this.employeeRepository = employeeRepository;
+    public EmployeeServiceImpl(ModelMapper mapper, DepartmentRepository departmentRepository, EmployeeRepository employeeRepository, ObjectMapper objectMapper) {
         this.mapper = mapper;
         this.departmentRepository = departmentRepository;
+        this.employeeRepository = employeeRepository;
         this.objectMapper = objectMapper;
     }
 
     // Creates and saves a new Employee to the employee database.
-    @Override
-    public EmployeeDTO createEmployee(EmployeeDTO newEmployeeData) {
+@Override
+public EmployeeDTO createEmployee(EmployeeDTO newEmployeeData) {
 
-       Employee employee = mapper.map(newEmployeeData,Employee.class);
+    Employee employee = mapper.map(newEmployeeData,Employee.class);
 
         Department dept = departmentRepository.findById(newEmployeeData.getDepartmentId()).orElseThrow(()-> new NoSuchElementException("Department not found with ID: " + newEmployeeData.getDepartmentId()));
 
@@ -55,8 +57,11 @@ public class EmployeeServiceImpl implements EmployeeService{
 
     // Returns a list of all employees in the database.
     @Override
-    public List<Employee> getAllEmployees() {
-        return employeeRepository.findAll();
+    public List<EmployeeDTO> getAllEmployees() {
+        return employeeRepository.findAll()
+                .stream()
+                .map(e -> mapper.map(e,EmployeeDTO.class))
+                .collect(Collectors.toList());
     }
 
 
@@ -86,6 +91,7 @@ public class EmployeeServiceImpl implements EmployeeService{
 
 
             // Skip null values
+
             if(value == null){
                 continue;
             }
@@ -98,7 +104,6 @@ public class EmployeeServiceImpl implements EmployeeService{
                 case "hireDate" -> matchingEmployee.setHireDate((String) value);
             }
 
-
         }
 
         Employee savedEmployee = employeeRepository.save(matchingEmployee);
@@ -106,6 +111,7 @@ public class EmployeeServiceImpl implements EmployeeService{
         return mapper.map(savedEmployee, EmployeeDTO.class);
 
     }
+
 
     // Update specific fields on an Employee Entity
     @Override
