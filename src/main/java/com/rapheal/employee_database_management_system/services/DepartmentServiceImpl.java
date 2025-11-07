@@ -5,6 +5,7 @@ import com.rapheal.employee_database_management_system.DTOs.DepartmentDTO;
 import com.rapheal.employee_database_management_system.DTOs.EmployeeDTO;
 import com.rapheal.employee_database_management_system.entites.Department;
 import com.rapheal.employee_database_management_system.entites.Employee;
+import com.rapheal.employee_database_management_system.exception.ResourceNotFoundException;
 import com.rapheal.employee_database_management_system.repositories.DepartmentRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +14,6 @@ import org.springframework.stereotype.Service;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Service
@@ -64,7 +64,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     // Find and returns a particular department as DTO using the department ID
     @Override
     public DepartmentDTO getDepartmentById(Long id) {
-       Department  matchingDepartment = departmentRepository.findById(id).orElseThrow(()-> new NoSuchElementException("Department with ID: "+ id + " not found"));
+       Department  matchingDepartment = departmentRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Department with ID: "+ id + " not found"));
 
        return mapper.map(matchingDepartment, DepartmentDTO.class);
     }
@@ -73,7 +73,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Override
     public DepartmentDTO updateDepartmentDetails(Long id, DepartmentDTO newDepartmentDetails) {
 
-        Department  matchingDepartment = departmentRepository.findById(id).orElseThrow(()-> new NoSuchElementException("Department with ID: "+ id + " not found"));
+        Department  matchingDepartment = departmentRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Department with ID: "+ id + " not found"));
 
 
 
@@ -100,7 +100,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     // deletes a specific department record from the database using the specified ID
     @Override
     public void deleteDepartmentById(Long id) {
-        Department matchingDepartment = departmentRepository.findById(id).orElseThrow(()-> new NoSuchElementException("Department with ID: " + id + " not found"));
+        Department matchingDepartment = departmentRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Department with ID: " + id + " not found"));
 
         departmentRepository.delete(matchingDepartment);
 
@@ -110,7 +110,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     // Throws an exception if the department is not found.
     @Override
     public List<EmployeeDTO> getDepartmentEmployees(Long id) {
-        Department matchingDepartment = departmentRepository.findById(id).orElseThrow(()-> new NoSuchElementException("Department with id: " + id + " not found"));
+        Department matchingDepartment = departmentRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Department with id: " + id + " not found"));
 
         return matchingDepartment.getEmployees()
                 .stream()

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rapheal.employee_database_management_system.DTOs.EmployeeDTO;
 import com.rapheal.employee_database_management_system.entites.Department;
 import com.rapheal.employee_database_management_system.entites.Employee;
+import com.rapheal.employee_database_management_system.exception.ResourceNotFoundException;
 import com.rapheal.employee_database_management_system.repositories.DepartmentRepository;
 import com.rapheal.employee_database_management_system.repositories.EmployeeRepository;
 import org.modelmapper.ModelMapper;
@@ -12,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Service
@@ -43,14 +43,18 @@ public class EmployeeServiceImpl implements EmployeeService{
 @Override
 public EmployeeDTO createEmployee(EmployeeDTO newEmployeeData) {
 
-    Employee employee = mapper.map(newEmployeeData,Employee.class);
+    Employee employee = new Employee();
+    employee.setFirstName(newEmployeeData.getFirstName());
+    employee.setLastName(newEmployeeData.getLastName());
+    employee.setEmail(newEmployeeData.getEmail());
+    employee.setAge(newEmployeeData.getAge());
+    employee.setHireDate(newEmployeeData.getHireDate());
+    employee.setDepartment(departmentRepository.findById(newEmployeeData.getDepartmentId())
+            .orElseThrow(() -> new ResourceNotFoundException("Department not found")));
+    Employee savedEmployee = employeeRepository.save(employee);
 
-        Department dept = departmentRepository.findById(newEmployeeData.getDepartmentId()).orElseThrow(()-> new NoSuchElementException("Department not found with ID: " + newEmployeeData.getDepartmentId()));
 
-        dept.addEmployee(employee);
-        Employee savedEmployee = employeeRepository.save(employee);
-
-        return mapper.map(savedEmployee,EmployeeDTO.class);
+    return mapper.map(savedEmployee,EmployeeDTO.class);
 
     }
 
@@ -69,7 +73,7 @@ public EmployeeDTO createEmployee(EmployeeDTO newEmployeeData) {
     @Override
     public EmployeeDTO getEmployeeById(Long id) {
 
-        Employee matchingEmployee = employeeRepository.findById(id).orElseThrow(()-> new NoSuchElementException("Employed with ID: " + id + " could not be found"));
+        Employee matchingEmployee = employeeRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Employed with ID: " + id + " could not be found"));
 
        return  mapper.map(matchingEmployee,EmployeeDTO.class);
     }
@@ -79,7 +83,7 @@ public EmployeeDTO createEmployee(EmployeeDTO newEmployeeData) {
     @Override
     public EmployeeDTO updateEmployeeDetails(Long id, EmployeeDTO newEmployeeDetails) {
 
-        Employee matchingEmployee = employeeRepository.findById(id).orElseThrow(()-> new NoSuchElementException("Employed with ID: " + id + " could not be found"));
+        Employee matchingEmployee = employeeRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Employed with ID: " + id + " could not be found"));
 
         Map<String, Object> employeeDetails = objectMapper.convertValue(newEmployeeDetails, Map.class);
 
@@ -106,7 +110,7 @@ public EmployeeDTO createEmployee(EmployeeDTO newEmployeeData) {
 
         if (newEmployeeDetails.getDepartmentId() != null) {
             Department newDepartment = departmentRepository.findById(newEmployeeDetails.getDepartmentId())
-                    .orElseThrow(() -> new NoSuchElementException("Department not found"));
+                    .orElseThrow(() ->new ResourceNotFoundException("Department not found"));
 
             Department currentDepartment = matchingEmployee.getDepartment();
 
@@ -128,7 +132,7 @@ public EmployeeDTO createEmployee(EmployeeDTO newEmployeeData) {
     @Override
     public EmployeeDTO updateEmployeeDetailsPartially(Long id, Map<String, Object> updateData) {
 
-        Employee matchingEmployee = employeeRepository.findById(id).orElseThrow(()-> new NoSuchElementException("Employed with ID: " + id + " could not be found"));
+        Employee matchingEmployee = employeeRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Employed with ID: " + id + " could not be found"));
 
         for(Map.Entry<String, Object> entry : updateData.entrySet()){
             String key = entry.getKey();
@@ -144,7 +148,7 @@ public EmployeeDTO createEmployee(EmployeeDTO newEmployeeData) {
                 case "hireDate" -> matchingEmployee.setHireDate((String) value);
                 case "departmentId" -> {
                     Department newDept = departmentRepository.findById(Long.parseLong(value.toString()))
-                            .orElseThrow(() -> new NoSuchElementException("Department not found"));
+                            .orElseThrow(() ->new ResourceNotFoundException("Department not found"));
 
                     Department currentDept = matchingEmployee.getDepartment();
                     if (currentDept != null && !currentDept.equals(newDept)) {
@@ -168,7 +172,7 @@ public EmployeeDTO createEmployee(EmployeeDTO newEmployeeData) {
     @Override
     public void deleteEmployee(Long id) {
 
-        Employee matchingEmployee = employeeRepository.findById(id).orElseThrow(()-> new NoSuchElementException("Employed with ID: " + id + " could not be found"));
+        Employee matchingEmployee = employeeRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Employed with ID: " + id + " could not be found"));
 
         employeeRepository.delete(matchingEmployee);
     }
